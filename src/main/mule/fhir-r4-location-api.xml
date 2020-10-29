@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <http:listener-config name="fhir-r4-location-api-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="fhir-r4-location-api-config" api="resource::17473fef-b0b5-40f2-b1a0-72bee4bed13c:fhir-r4-location-api:1.0.0:raml:zip:fhir-r4-location-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="fhir-r4-location-api-main">
+        <http:listener config-ref="fhir-r4-location-api-httpListenerConfig" path="/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <flow-ref doc:name="fhir-set-common-variables" doc:id="4ecd3a2a-48c8-4815-b5f0-1c5e478d108c" name="fhir-set-common-variables"/>
+		<apikit:router config-ref="fhir-r4-location-api-config" />
+        <flow-ref doc:name="transform-output-to-accept-header" doc:id="ba66d074-e798-434e-8fb0-3d2d086972f2" name="transform-output-to-accept-header"/>
+		<error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="fhir-r4-location-api-console">
+        <http:listener config-ref="fhir-r4-location-api-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="fhir-r4-location-api-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="put:\Location\(id):application\fhir+json:fhir-r4-location-api-config">
+		<flow-ref doc:name="put\(Resource)\(id):application\fhir+json" doc:id="202f3488-e93e-4a7a-8a03-a1ebaec565c3" name="put\(Resource)\(id):application\fhir+json"/>
+    </flow>
+    <flow name="put:\Location\(id):application\fhir+xml:fhir-r4-location-api-config">
+		<flow-ref doc:name="xml_to_json" doc:id="14313798-9caf-47b9-8e60-fe4c5d4bb717" name="xml_to_json"/>
+		<flow-ref doc:name="put:\Location\(id):application\fhir+json:fhir-r4-location-api-config" doc:id="af6519ec-b29f-4593-8965-972bd94ca220" name="put:\Location\(id):application\fhir+json:fhir-r4-location-api-config"/>
+    </flow>
+    <flow name="delete:\Location\(id):fhir-r4-location-api-config">
+		<flow-ref doc:name="delete\(Resource)\(id)" doc:id="9acd0085-a949-4edd-81bd-f6ce23e24c05" name="delete\(Resource)\(id)"/>
+    </flow>
+    <flow name="get:\Location:fhir-r4-location-api-config">
+		<flow-ref doc:name="get\(Resource)" doc:id="1d20b90f-ccb2-49be-87e5-af66d169a917" name="get\(Resource)"/>
+    </flow>
+    <flow name="get:\Location\(id)\_history:fhir-r4-location-api-config">
+		<flow-ref doc:name="get\(Resource)\(id)\_history" doc:id="f9aa6431-d90c-41a3-8099-c4e6e9a34245" name="get\(Resource)\(id)\_history"/>
+    </flow>
+    <flow name="get:\Location\(id):fhir-r4-location-api-config">
+		<flow-ref doc:name="get\(Resource)\(id)" doc:id="7fc0b299-03b8-41c4-9e62-ce082de14c13" name="get\(Resource)\(id)"/>
+    </flow>
+    <flow name="get:\Location\(id)\_history\(vid):fhir-r4-location-api-config">
+		<flow-ref doc:name="get\(Resource)\(id)\_history\(vid)" doc:id="321c184b-f1f8-4df7-a9d1-6b25a3a56f1c" name="get\(Resource)\(id)\_history\(vid)"/>
+    </flow>
+	<flow name="post:\Location:application\fhir+json:fhir-r4-location-api-config">
+		<flow-ref doc:name="post\(Resource):application\fhir+json" doc:id="e0b3f7d6-6b2f-4102-8212-88e26d3d42fc" name="post\(Resource):application\fhir+json"/>
+    </flow>
+    <flow name="post:\Location:application\fhir+xml:fhir-r4-location-api-config">
+		<flow-ref doc:name="xml_to_json" doc:id="e590518a-f6a0-4cda-b18f-6403921f9044" name="xml_to_json"/>
+		<flow-ref doc:name="post:\Location:application\fhir+json:fhir-r4-location-api-config" doc:id="cd137a6a-2505-4722-815d-af74178ccdeb" name="post:\Location:application\fhir+json:fhir-r4-location-api-config"/>
+    </flow>
+	<sub-flow name="xml_to_json" doc:id="3e0fe4b4-aa24-4f74-a8de-7e4ab2ca0035" >
+		<ee:transform doc:name="convert XML to JSON" doc:id="274acea1-d032-4a2a-9f4b-514b30a9d318" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+import * from dw::fhir::xmlToJson
+---
+fhirXMLToJson(payload, ["identifier", "alias", "telecom", "line", "address", "coding", "endpoint"])]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>
