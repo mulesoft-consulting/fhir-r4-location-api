@@ -65,8 +65,14 @@
       <classifier>mule-plugin</classifier>
       <scope>test</scope>
     </dependency>
-  </dependencies>
+  	<dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-validation-module</artifactId>
+            <version>1.4.0</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+    </dependencies>
 <properties>
-        <app.runtime>4.2.0-hf3</app.runtime>
+        <app.runtime>4.3.0-20201013</app.runtime>
     </properties>
 </project>
