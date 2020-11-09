@@ -183,6 +183,7 @@ output application/json
 		<flow-ref doc:name="get\(Resource)\(id)\_history\(vid)" doc:id="321c184b-f1f8-4df7-a9d1-6b25a3a56f1c" name="get\(Resource)\(id)\_history\(vid)"/>
     </flow>
 	<flow name="post:\Location:application\fhir+json:fhir-r4-location-api-config">
+		<flow-ref doc:name="Data Validation" doc:id="900e2b13-03a4-4769-8f2c-f7062244ed77" name="Data-Validation-Flow"/>
 		<flow-ref doc:name="post\(Resource):application\fhir+json" doc:id="e0b3f7d6-6b2f-4102-8212-88e26d3d42fc" name="post\(Resource):application\fhir+json"/>
     </flow>
     <flow name="post:\Location:application\fhir+xml:fhir-r4-location-api-config">
