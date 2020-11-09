@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="location-object-example" format="json">
+      <types:shape format="weave" example="examples/location-API-post-put-1.json"><![CDATA[%dw 2.0
+
+type location_object_example = {|
+  resourceType: String, 
+  text: {|
+    status: String, 
+    div: String
+  |}, 
+  identifier: Array<{| value: String |}>, 
+  status: String, 
+  name: String, 
+  alias: Array<String>, 
+  description: String, 
+  mode: String, 
+  telecom: Array<{|    system: String,     value: String,     use: String  |}>, 
+  address: {|
+    use: String, 
+    line: Array<String>, 
+    city: String, 
+    postalCode: String, 
+    country: String
+  |}, 
+  physicalType: {|
+    coding: Array<{|      system: String,       code: String,       display: String    |}>
+  |}, 
+  position: {|
+    longitude: Number {"typeId": "double"}, 
+    latitude: Number {"typeId": "double"}, 
+    altitude: Number {"typeId": "int"}
+  |}, 
+  managingOrganization: {| reference: String |}, 
+  endpoint: Array<{| reference: String |}>
+|} {"example": "{\\\"resourceType\\\":\\\"Location\\\",\\\"text\\\":{\\\"status\\\":\\\"generated\\\",\\\"div\\\":\\\"<div xmlns=\\\\\\\"http:\\/\\/www.w3.org\\/1999\\/xhtml\\\\\\\">Burgers UMC, South Wing, second floor<\\/div>\\\"},\\\"identifier\\\":[{\\\"value\\\":\\\"B1-S.F2\\\"}],\\\"status\\\":\\\"active\\\",\\\"name\\\":\\\"South Wing, second floor\\\",\\\"alias\\\":[\\\"BU MC, SW, F2\\\",\\\"Burgers University Medical Center, South Wing, second floor\\\"],\\\"description\\\":\\\"Second floor of the Old South Wing, formerly in use by Psychiatry\\\",\\\"mode\\\":\\\"instance\\\",\\\"telecom\\\":[{\\\"system\\\":\\\"phone\\\",\\\"value\\\":\\\"2328\\\",\\\"use\\\":\\\"work\\\"},{\\\"system\\\":\\\"fax\\\",\\\"value\\\":\\\"2329\\\",\\\"use\\\":\\\"work\\\"},{\\\"system\\\":\\\"email\\\",\\\"value\\\":\\\"second wing admissions\\\"},{\\\"system\\\":\\\"url\\\",\\\"value\\\":\\\"http:\\/\\/sampleorg.com\\/southwing\\\",\\\"use\\\":\\\"work\\\"}],\\\"address\\\":{\\\"use\\\":\\\"work\\\",\\\"line\\\":[\\\"Galapagosweg 91, Building A\\\"],\\\"city\\\":\\\"Den Burg\\\",\\\"postalCode\\\":\\\"9105 PZ\\\",\\\"country\\\":\\\"NLD\\\"},\\\"physicalType\\\":{\\\"coding\\\":[{\\\"system\\\":\\\"http:\\/\\/terminology.hl7.org\\/CodeSystem\\/location-physical-type\\\",\\\"code\\\":\\\"wi\\\",\\\"display\\\":\\\"Wing\\\"}]},\\\"position\\\":{\\\"longitude\\\":-83.6945691,\\\"latitude\\\":42.25475478,\\\"altitude\\\":0},\\\"managingOrganization\\\":{\\\"reference\\\":\\\"Organization\\/f001\\\"},\\\"endpoint\\\":[{\\\"reference\\\":\\\"Endpoint\\/example\\\"}]}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#0bc17e5b-4bd1-4d4f-8894-50891805305c">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="location-object-example"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

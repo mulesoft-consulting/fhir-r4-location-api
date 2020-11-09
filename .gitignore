@@ -12,7 +12,7 @@
 *.jar
 *.war
 *.ear
-
+local-props.xml
 # ------------------------------------------------------------------------------------------- #
 # Eclipse-specific (https://github.com/github/gitignore/blob/master/Global/Eclipse.gitignore) #
 # ------------------------------------------------------------------------------------------- #
